@@ -1,8 +1,9 @@
-const CACHE_NAME = 'dads-daily-driver-v1';
+const CACHE_NAME = 'dads-daily-driver-v2';
 const APP_SHELL = [
   '/',
   '/manifest.webmanifest',
-  '/favicon.svg',
+  '/logo-icon.png',
+  '/icon-192.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -36,5 +37,22 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => caches.match(event.request)),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const targetUrl = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        const appClient = clientList.find((client) => client.url.includes(self.location.origin));
+        if (appClient) {
+          appClient.focus();
+          return appClient.navigate(targetUrl);
+        }
+        return self.clients.openWindow(targetUrl);
+      }),
   );
 });

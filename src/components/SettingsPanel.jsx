@@ -1,15 +1,21 @@
 import { useState } from 'react';
-import { User, MapPin, Globe, Download, Phone, Moon, Sun, RefreshCw, X } from 'lucide-react';
+import { User, MapPin, Globe, Download, Phone, Moon, Sun, RefreshCw, X, Bell } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getSetup, uploadProfilePhoto } from '../services/setupService';
 import { usePwaInstall } from '../hooks/usePwaInstall';
+import {
+  disableAlertNotifications,
+  getNotificationState,
+  requestAlertNotifications,
+} from '../services/notificationService';
 
 export default function SettingsPanel({ isDark, setIsDark, onRedo, className }) {
   const [setup, setSetup] = useState(() => getSetup() || {});
   const { canInstall, isInstalled, install } = usePwaInstall();
   const [showInstallHelp, setShowInstallHelp] = useState(false);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [notificationState, setNotificationState] = useState(() => getNotificationState());
 
   const handleInstall = async () => {
     if (isInstalled) return;
@@ -33,6 +39,21 @@ export default function SettingsPanel({ isDark, setIsDark, onRedo, className }) 
       event.target.value = '';
     }
   };
+
+  const handleNotifications = async () => {
+    if (notificationState === 'enabled') {
+      setNotificationState(disableAlertNotifications());
+      return;
+    }
+    setNotificationState(await requestAlertNotifications());
+  };
+
+  const notificationText = {
+    enabled: 'Alerts enabled',
+    disabled: 'Enable medicine and reminder alerts',
+    blocked: 'Notifications blocked in browser settings',
+    unsupported: 'Notifications not supported here',
+  }[notificationState];
 
   return (
     <div className={cn("mx-auto w-full max-w-3xl px-4 py-2 md:px-6 lg:px-8 flex flex-col overflow-hidden", className)}>
@@ -131,6 +152,42 @@ export default function SettingsPanel({ isDark, setIsDark, onRedo, className }) 
               <span className="text-text-muted dark:text-gray-400 font-medium text-sm">{setup.language || 'English'}</span>
             </div>
           </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+          <h3 className="text-xs font-bold tracking-wider uppercase text-text-muted dark:text-gray-500 ml-2">Alerts</h3>
+          <button
+            onClick={handleNotifications}
+            disabled={notificationState === 'blocked' || notificationState === 'unsupported'}
+            className={cn(
+              "premium-card p-4 flex items-center justify-between gap-4 dark:bg-gray-800 dark:shadow-none w-full text-left transition-colors border border-gray-100 dark:border-gray-700",
+              notificationState === 'enabled' ? "border-success/30" : "hover:bg-gray-50 dark:hover:bg-gray-700",
+              (notificationState === 'blocked' || notificationState === 'unsupported') && "opacity-70 cursor-not-allowed"
+            )}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <div className={cn(
+                "p-2 rounded-xl shrink-0",
+                notificationState === 'enabled'
+                  ? "bg-success/10 text-success"
+                  : "bg-primary/10 text-primary"
+              )}>
+                <Bell size={18} />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="font-semibold text-text-deep dark:text-white">Phone Notifications</span>
+                <span className="text-xs text-text-muted dark:text-gray-400 mt-0.5">{notificationText}</span>
+              </div>
+            </div>
+            <span className={cn(
+              "px-3 py-1.5 rounded-full text-xs font-bold shrink-0",
+              notificationState === 'enabled'
+                ? "bg-success/10 text-success"
+                : "bg-gray-100 dark:bg-gray-700 text-text-muted dark:text-gray-300"
+            )}>
+              {notificationState === 'enabled' ? 'On' : 'Off'}
+            </span>
+          </button>
         </div>
 
         {/* Emergency contact — from setup */}

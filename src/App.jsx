@@ -12,6 +12,7 @@ import SettingsPanel from './components/SettingsPanel';
 import SetupWizard from './components/SetupWizard';
 import { useDarkMode } from './hooks/useDarkMode';
 import { fetchSetup, isSetupComplete } from './services/setupService';
+import { startAlertNotifications, stopAlertNotifications } from './services/notificationService';
 import { motion, AnimatePresence } from 'framer-motion';
 
 function App() {
@@ -31,6 +32,12 @@ function App() {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!setupDone) return undefined;
+    startAlertNotifications();
+    return stopAlertNotifications;
+  }, [setupDone]);
 
   if (!setupChecked) {
     return <div className="min-h-screen bg-app-bg dark:bg-gray-950" />;
