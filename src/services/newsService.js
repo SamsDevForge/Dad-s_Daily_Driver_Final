@@ -1,12 +1,40 @@
 import { newsData } from '../data/mockData';
 import { apiFetch } from './api';
 
-const cleanNewsText = (value = '') => String(value)
+const htmlEntities = {
+  amp: '&',
+  apos: "'",
+  hellip: '...',
+  laquo: '"',
+  ldquo: '"',
+  lsquo: "'",
+  nbsp: ' ',
+  quot: '"',
+  raquo: '"',
+  rdquo: '"',
+  rsquo: "'",
+};
+
+const decodeHtmlEntities = (value) => value.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, entity) => {
+  const normalized = entity.toLowerCase();
+  if (normalized[0] === '#') {
+    const codePoint = normalized[1] === 'x'
+      ? Number.parseInt(normalized.slice(2), 16)
+      : Number.parseInt(normalized.slice(1), 10);
+    return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+  }
+  return htmlEntities[normalized] || match;
+});
+
+const cleanNewsText = (value = '') => decodeHtmlEntities(String(value)
+  .replace(/<\s*br\s*\/?>/gi, ' ')
+  .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, ' ')
+  .replace(/<[^>]*>/g, ' ')
   .replace(/ONLY AVAILABLE IN PAID PLANS/gi, '')
   .replace(/\[\s*\+\s*\d+\s*chars\s*\]/gi, '')
   .replace(/\s*\.\.\.\s*$/g, '')
   .replace(/\s{2,}/g, ' ')
-  .trim();
+  .trim());
 
 const titleCase = (value = '') => value
   .split(' ')

@@ -168,13 +168,43 @@ function newsDateLabel(pubDate) {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+const htmlEntities = {
+  amp: '&',
+  apos: "'",
+  hellip: '...',
+  laquo: '"',
+  ldquo: '"',
+  lsquo: "'",
+  nbsp: ' ',
+  quot: '"',
+  raquo: '"',
+  rdquo: '"',
+  rsquo: "'",
+};
+
+function decodeHtmlEntities(value) {
+  return value.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (match, entity) => {
+    const normalized = entity.toLowerCase();
+    if (normalized[0] === '#') {
+      const codePoint = normalized[1] === 'x'
+        ? Number.parseInt(normalized.slice(2), 16)
+        : Number.parseInt(normalized.slice(1), 10);
+      return Number.isFinite(codePoint) ? String.fromCodePoint(codePoint) : match;
+    }
+    return htmlEntities[normalized] || match;
+  });
+}
+
 function cleanNewsText(value = '') {
-  return String(value)
+  return decodeHtmlEntities(String(value)
+    .replace(/<\s*br\s*\/?>/gi, ' ')
+    .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
     .replace(/ONLY AVAILABLE IN PAID PLANS/gi, '')
     .replace(/\[\s*\+\s*\d+\s*chars\s*\]/gi, '')
     .replace(/\s*\.\.\.\s*$/g, '')
     .replace(/\s{2,}/g, ' ')
-    .trim();
+    .trim());
 }
 
 function categoryLabel(category, fallback = 'India') {
