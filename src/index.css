@@ -116,4 +116,10 @@
     background-color: #B8860B;
     color: #FFFFFF;
   }
+
+  .setup-summary-card span:last-child {
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
 }

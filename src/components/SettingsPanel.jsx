@@ -35,7 +35,7 @@ export default function SettingsPanel({ isDark, setIsDark, onRedo, className }) 
   };
 
   return (
-    <div className={cn("px-4 py-2 flex flex-col overflow-hidden", className)}>
+    <div className={cn("mx-auto w-full max-w-3xl px-4 py-2 md:px-6 lg:px-8 flex flex-col overflow-hidden", className)}>
       <div className="flex-1 overflow-y-auto px-2 pb-6 flex flex-col gap-6">
 
         {/* Profile card */}
@@ -187,13 +187,13 @@ export default function SettingsPanel({ isDark, setIsDark, onRedo, className }) 
 
       <AnimatePresence>
         {showInstallHelp && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm md:items-center">
             <motion.div
               initial={{ opacity: 0, y: "100%" }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: "100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.35 }}
-              className="modal-sheet w-full max-w-md rounded-t-[32px] p-6 shadow-2xl border-t border-gray-100 dark:border-gray-700"
+              className="modal-sheet w-full max-w-md rounded-t-[32px] md:rounded-[32px] p-6 shadow-2xl border-t md:border border-gray-100 dark:border-gray-700"
             >
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-xl font-bold text-text-deep dark:text-white">Install App</h3>

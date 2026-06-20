@@ -9,21 +9,40 @@ function DocumentCard({ doc }) {
   const Icon = isPdf ? FileText : ImageIcon;
   const canOpen = Boolean(doc.url);
 
+  const getOpenUrl = () => {
+    if (!doc.url?.startsWith('data:')) return doc.url;
+
+    const [meta, data] = doc.url.split(',');
+    const mime = meta.match(/data:(.*?);base64/)?.[1] || 'application/octet-stream';
+    const binary = atob(data);
+    const bytes = new Uint8Array(binary.length);
+
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+
+    return URL.createObjectURL(new Blob([bytes], { type: mime }));
+  };
+
   const handleOpen = () => {
     if (!canOpen) return;
-    const newWindow = window.open();
-    if (newWindow) {
-      newWindow.document.title = doc.name;
-      if (isPdf) {
-        newWindow.location.href = doc.url;
-      } else {
-        newWindow.document.body.style.margin = '0';
-        newWindow.document.body.style.background = '#111827';
-        newWindow.document.body.innerHTML = `<img src="${doc.url}" alt="${doc.name}" style="max-width:100%;height:auto;display:block;margin:0 auto;" />`;
-      }
-      return;
+    const openUrl = getOpenUrl();
+    const opened = window.open(openUrl, '_blank', 'noopener,noreferrer');
+
+    if (!opened) {
+      const link = document.createElement('a');
+      link.href = openUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.download = doc.name || 'document';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
     }
-    window.location.href = doc.url;
+
+    if (openUrl.startsWith('blob:')) {
+      window.setTimeout(() => URL.revokeObjectURL(openUrl), 60000);
+    }
   };
 
   return (
@@ -106,7 +125,7 @@ export default function DocumentVault({ className }) {
   };
 
   return (
-    <div className={cn("px-4 py-2 flex flex-col overflow-hidden", className)}>
+    <div className={cn("mx-auto w-full max-w-6xl px-4 py-2 md:px-6 lg:px-8 flex flex-col overflow-hidden", className)}>
       <div className="flex items-center justify-between mb-4 shrink-0 px-2 mt-2">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-gray-100 dark:bg-gray-800 text-text-deep dark:text-white">
@@ -131,18 +150,20 @@ export default function DocumentVault({ className }) {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-24 flex flex-col gap-3 relative">
+      <div className="flex-1 overflow-y-auto px-2 pb-24 md:pb-8 relative">
         {filteredDocs.length > 0 ? (
-          filteredDocs.map((doc, i) => (
-            <motion.div
-              key={doc.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <DocumentCard doc={doc} />
-            </motion.div>
-          ))
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 xl:grid-cols-3">
+            {filteredDocs.map((doc, i) => (
+              <motion.div
+                key={doc.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <DocumentCard doc={doc} />
+              </motion.div>
+            ))}
+          </div>
         ) : (
           <div className="py-12 text-center flex flex-col items-center justify-center">
             <FileBox className="text-gray-300 mb-4" size={48} />
@@ -161,13 +182,13 @@ export default function DocumentVault({ className }) {
 
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm md:items-center">
              <motion.div 
                initial={{ opacity: 0, y: "100%" }}
                animate={{ opacity: 1, y: 0 }}
                exit={{ opacity: 0, y: "100%" }}
                transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-               className="modal-sheet w-full max-w-md rounded-t-[32px] p-6 shadow-2xl border-t border-gray-100 dark:border-gray-700 max-h-[90vh] overflow-y-auto pb-safe"
+               className="modal-sheet w-full max-w-md rounded-t-[32px] md:rounded-[32px] p-6 shadow-2xl border-t md:border border-gray-100 dark:border-gray-700 max-h-[90vh] md:max-h-[86vh] overflow-y-auto pb-safe"
              >
                <div className="flex justify-between items-center mb-6">
                  <h3 className="text-xl font-bold text-text-deep dark:text-white">Upload Document</h3>

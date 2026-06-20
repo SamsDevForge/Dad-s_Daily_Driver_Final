@@ -109,7 +109,7 @@ export default function MedicineManager({ className }) {
   };
 
   return (
-    <div className={cn("px-4 py-2 flex flex-col overflow-hidden", className)}>
+    <div className={cn("mx-auto w-full max-w-6xl px-4 py-2 md:px-6 lg:px-8 flex flex-col overflow-hidden", className)}>
       <div className="flex items-center justify-between mb-4 shrink-0 px-2 mt-2">
         <div className="flex items-center gap-3">
           <div className="p-2 rounded-xl bg-success/10 text-success">
@@ -121,7 +121,7 @@ export default function MedicineManager({ className }) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-24 flex flex-col gap-4 relative">
+      <div className="flex-1 overflow-y-auto px-2 pb-24 md:pb-8 relative">
         {medicines.length === 0 && (
           <div className="py-12 text-center flex flex-col items-center justify-center">
             <AlertCircle className="text-gray-300 mb-3" size={40} />
@@ -129,16 +129,18 @@ export default function MedicineManager({ className }) {
           </div>
         )}
 
-        {medicines.map((med, i) => (
-          <motion.div
-            key={med.id}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
-          >
-            <MedicineCard medicine={med} onToggle={handleToggle} />
-          </motion.div>
-        ))}
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {medicines.map((med, i) => (
+            <motion.div
+              key={med.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.1 }}
+            >
+              <MedicineCard medicine={med} onToggle={handleToggle} />
+            </motion.div>
+          ))}
+        </div>
         
         <button 
           onClick={() => setIsModalOpen(true)}
@@ -150,13 +152,13 @@ export default function MedicineManager({ className }) {
 
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm md:items-center">
             <motion.div 
               initial={{ opacity: 0, y: "100%" }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: "100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="modal-sheet w-full max-w-md rounded-t-[32px] p-6 shadow-2xl border-t border-gray-100 dark:border-gray-700 max-h-[90vh] overflow-y-auto pb-safe"
+              className="modal-sheet w-full max-w-md rounded-t-[32px] md:rounded-[32px] p-6 shadow-2xl border-t md:border border-gray-100 dark:border-gray-700 max-h-[90vh] md:max-h-[86vh] overflow-y-auto pb-safe"
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-text-deep dark:text-white">New Medicine</h3>

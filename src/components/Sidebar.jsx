@@ -14,7 +14,7 @@ const navItems = [
 export default function Sidebar({ activeTab, setActiveTab, className }) {
   return (
     <div className={cn(
-      "hidden md:flex flex-col w-64 h-screen border-r border-gray-100 bg-surface p-6 shadow-sm",
+      "hidden md:flex flex-col w-64 h-screen border-r border-gray-100 bg-surface p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900",
       className
     )}>
       {/* App identity */}
@@ -24,11 +24,14 @@ export default function Sidebar({ activeTab, setActiveTab, className }) {
           alt="Dad's Daily Driver"
           className="h-12 w-12 rounded-2xl object-cover shadow-sm"
         />
-        <img
-          src="/logo-full.png"
-          alt="Dad's Daily Driver"
-          className="h-12 w-auto max-w-[150px] object-contain"
-        />
+        <div className="flex flex-col leading-none">
+          <span className="text-xl font-black tracking-tight text-text-deep dark:text-white">
+            Dad's
+          </span>
+          <span className="text-sm font-bold text-secondary">
+            Daily Driver
+          </span>
+        </div>
       </div>
 
       {/* Navigation */}
@@ -45,7 +48,7 @@ export default function Sidebar({ activeTab, setActiveTab, className }) {
                 "relative flex items-center gap-3 px-4 py-3 rounded-2xl outline-none text-left transition-all",
                 isActive
                   ? "text-primary font-bold"
-                  : "text-text-muted hover:bg-app-bg font-medium"
+                  : "text-text-muted dark:text-gray-400 hover:bg-app-bg dark:hover:bg-gray-800 font-medium"
               )}
             >
               {isActive && (
@@ -64,9 +67,9 @@ export default function Sidebar({ activeTab, setActiveTab, className }) {
 
       {/* Footer status */}
       <div className="mt-auto">
-        <div className="p-4 rounded-2xl bg-secondary/8 border border-secondary/10">
+        <div className="p-4 rounded-2xl bg-secondary/8 border border-secondary/10 dark:bg-secondary/15 dark:border-secondary/20">
           <p className="text-xs font-bold text-secondary/70 mb-0.5 uppercase tracking-wider">Status</p>
-          <p className="text-sm font-semibold text-text-deep">All systems operational.</p>
+          <p className="text-sm font-semibold text-text-deep dark:text-white">All systems operational.</p>
         </div>
       </div>
     </div>

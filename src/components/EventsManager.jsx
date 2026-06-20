@@ -114,14 +114,14 @@ export default function EventsManager({ className }) {
   ];
 
   return (
-    <div className={cn("px-4 py-2 flex flex-col overflow-hidden", className)}>
+    <div className={cn("mx-auto w-full max-w-4xl px-4 py-2 md:px-6 lg:px-8 flex flex-col overflow-hidden", className)}>
       <div className="flex items-center justify-between mb-6 shrink-0 px-2 mt-2">
         <h2 className="text-xl font-bold tracking-tight text-text-deep dark:text-white">
           Timeline
         </h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-24 flex flex-col relative">
+      <div className="flex-1 overflow-y-auto px-2 pb-24 md:pb-8 flex flex-col relative">
         <div className="py-2">
           {upNext && (
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
@@ -154,13 +154,13 @@ export default function EventsManager({ className }) {
 
       <AnimatePresence>
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm">
+          <div className="fixed inset-0 z-50 flex items-end justify-center bg-text-deep/40 backdrop-blur-sm md:items-center">
             <motion.div 
               initial={{ opacity: 0, y: "100%" }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: "100%" }}
               transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-              className="modal-sheet w-full max-w-md rounded-t-[32px] p-6 shadow-2xl border-t border-gray-100 dark:border-gray-700 max-h-[90vh] overflow-y-auto pb-safe"
+              className="modal-sheet w-full max-w-md rounded-t-[32px] md:rounded-[32px] p-6 shadow-2xl border-t md:border border-gray-100 dark:border-gray-700 max-h-[90vh] md:max-h-[86vh] overflow-y-auto pb-safe"
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-bold text-text-deep dark:text-white">Add Event</h3>

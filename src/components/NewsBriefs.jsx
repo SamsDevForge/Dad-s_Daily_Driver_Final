@@ -87,7 +87,7 @@ export default function NewsBriefs({ className }) {
   }, []);
 
   return (
-    <div className={cn("px-4 py-2 flex flex-col overflow-hidden", className)}>
+    <div className={cn("mx-auto w-full max-w-7xl px-4 py-2 md:px-6 lg:px-8 flex flex-col overflow-hidden", className)}>
       <div className="flex items-center gap-2 mb-4 shrink-0 px-2 mt-2">
         <div className="p-2 rounded-xl bg-primary/10 text-primary">
            <Newspaper size={20} />
@@ -99,13 +99,13 @@ export default function NewsBriefs({ className }) {
 
       <div className="flex-1 overflow-y-auto scrollbar-hide px-2 pb-6 flex flex-col gap-6">
         {loading ? (
-          <div className="grid grid-cols-1 gap-6">
-            {[1, 2].map(i => (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {[1, 2, 3].map(i => (
               <div key={i} className="h-64 premium-card rounded-2xl animate-pulse bg-gray-200 dark:bg-gray-800" />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
             {news.map((item, i) => (
               <motion.div 
                 key={item.id}

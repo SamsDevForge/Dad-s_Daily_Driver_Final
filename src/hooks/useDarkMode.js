@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 
 export function useDarkMode() {
   const [isDark, setIsDark] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem('ddd-dark-mode') === 'true';
+    if (typeof window === 'undefined') return true;
+    const stored = localStorage.getItem('ddd-dark-mode');
+    return stored === null ? true : stored === 'true';
   });
 
   useEffect(() => {

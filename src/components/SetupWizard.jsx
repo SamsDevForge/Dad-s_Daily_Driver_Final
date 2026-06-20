@@ -196,18 +196,18 @@ export default function SetupWizard({ onComplete }) {
               <div className="h-20 w-20 rounded-full bg-success/10 flex items-center justify-center text-success">
                 <CheckCircle2 size={48} />
               </div>
-              <div className="premium-card dark:bg-gray-800 p-4 w-full flex flex-col gap-2">
+              <div className="setup-summary-card premium-card dark:bg-gray-800 p-4 w-full flex flex-col gap-3">
                 {form.sonName && (
-                  <div className="flex justify-between text-sm">
+                  <div className="grid grid-cols-[auto,1fr] items-start gap-3 text-sm">
                     <span className="text-text-muted dark:text-gray-400">Son</span>
                     <span className="font-bold text-text-deep dark:text-white">{form.sonName} · {form.sonPhone}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-sm">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-3 text-sm">
                   <span className="text-text-muted dark:text-gray-400">City</span>
                   <span className="font-bold text-text-deep dark:text-white">{form.city}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="grid grid-cols-[auto,1fr] items-start gap-3 text-sm">
                   <span className="text-text-muted dark:text-gray-400">News Topics</span>
                   <span className="font-bold text-text-deep dark:text-white">{form.newsTopics.join(', ')}</span>
                 </div>
