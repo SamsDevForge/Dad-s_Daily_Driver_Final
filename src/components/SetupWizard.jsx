@@ -9,16 +9,7 @@ const NEWS_TOPICS = ['India', 'Business', 'Health', 'Local', 'Sports', 'Technolo
 const stripNameNumbers = (value) => value.replace(/[0-9]/g, '');
 
 const getIndianPhoneDigits = (value = '') => {
-  const digits = String(value).replace(/\D/g, '');
-  const localDigits = digits.length > 10 && digits.startsWith('91')
-    ? digits.slice(2)
-    : digits;
-  return localDigits.slice(0, 10);
-};
-
-const formatIndianPhone = (value) => {
-  const digits = getIndianPhoneDigits(value);
-  return digits ? `+91 ${digits}` : '+91 ';
+  return String(value).replace(/\D/g, '').slice(0, 10);
 };
 
 const steps = [
@@ -33,7 +24,7 @@ export default function SetupWizard({ onComplete }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     sonName: '',
-    sonPhone: '+91 ',
+    sonPhone: '',
     sonRelation: 'Son',
     city: 'Pune',
     newsTopics: ['India', 'Health'],
@@ -54,8 +45,12 @@ export default function SetupWizard({ onComplete }) {
   };
 
   const handleFinish = async () => {
-    await saveSetup(form);
-    onComplete(form);
+    const setup = {
+      ...form,
+      sonPhone: `+91 ${form.sonPhone}`,
+    };
+    await saveSetup(setup);
+    onComplete(setup);
   };
 
   const next = () => {
@@ -134,14 +129,18 @@ export default function SetupWizard({ onComplete }) {
                   <Phone size={18} className="text-primary shrink-0" />
                   <div className="flex-1">
                     <label className="text-[10px] font-bold uppercase tracking-wider text-text-muted dark:text-gray-500 block mb-0.5">Phone Number *</label>
-                    <input
-                      type="tel"
-                      placeholder="+91 98765 43210"
-                      value={form.sonPhone}
-                      onChange={e => setForm(f => ({ ...f, sonPhone: formatIndianPhone(e.target.value) }))}
-                      maxLength={14}
-                      className="w-full bg-transparent outline-none font-semibold text-text-deep dark:text-white text-base placeholder:text-gray-300 dark:placeholder:text-gray-600"
-                    />
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-primary shrink-0">+91</span>
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        placeholder="9876543210"
+                        value={form.sonPhone}
+                        onChange={e => setForm(f => ({ ...f, sonPhone: getIndianPhoneDigits(e.target.value) }))}
+                        maxLength={10}
+                        className="w-full bg-transparent outline-none font-semibold text-text-deep dark:text-white text-base placeholder:text-gray-300 dark:placeholder:text-gray-600"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -218,7 +217,7 @@ export default function SetupWizard({ onComplete }) {
                 {form.sonName && (
                   <div className="grid grid-cols-[auto,1fr] items-start gap-3 text-sm">
                     <span className="text-text-muted dark:text-gray-400">Son</span>
-                    <span className="font-bold text-text-deep dark:text-white">{form.sonName} · {form.sonPhone}</span>
+                    <span className="font-bold text-text-deep dark:text-white">{form.sonName} · +91 {form.sonPhone}</span>
                   </div>
                 )}
                 <div className="grid grid-cols-[auto,1fr] items-start gap-3 text-sm">
