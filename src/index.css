@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+  body {
+    background-color: #F6F3EE;
+    color: #1F2937;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Dark mode overrides applied via the .dark class on <html> */
+  .dark body {
+    background-color: #111827;
+    color: #F9FAFB;
+  }
+
+  .dark .premium-card {
+    background-color: #1F2937 !important;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.4) !important;
+  }
+
+  .dark .bg-app-bg {
+    background-color: #111827 !important;
+  }
+
+  /* Floating nav pill — keep dark in both modes */
+}
+
+
+@layer utilities {
+  .premium-card {
+    background-color: #FFFFFF;
+    border-radius: 1.5rem;
+    box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08), 0 4px 12px -5px rgba(0,0,0,0.04);
+    transition: all 0.3s ease;
+  }
+
+  .premium-card:hover {
+    box-shadow: 0 16px 48px -12px rgba(0,0,0,0.12), 0 6px 16px -6px rgba(0,0,0,0.06);
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .modal-sheet {
+    background-color: #FFFFFF;
+    color: #1F2937;
+  }
+
+  .dark .modal-sheet {
+    background-color: #1F2937;
+    color: #F9FAFB;
+  }
+
+  .form-label {
+    color: #6B7280;
+  }
+
+  .dark .form-label {
+    color: #D1D5DB;
+  }
+
+  .form-control {
+    background-color: #F6F3EE;
+    color: #1F2937;
+  }
+
+  .dark .form-control {
+    background-color: #111827;
+    color: #F9FAFB;
+    color-scheme: dark;
+  }
+
+  .form-control::placeholder {
+    color: transparent;
+  }
+
+  .form-control option {
+    color: #1F2937;
+    background-color: #FFFFFF;
+  }
+
+  .dark .form-control option {
+    color: #F9FAFB;
+    background-color: #111827;
+  }
+
+  .tag-button {
+    background-color: #F6F3EE;
+    color: #6B7280;
+  }
+
+  .dark .tag-button {
+    background-color: #111827;
+    color: #D1D5DB;
+  }
+
+  .tag-button-active {
+    background-color: #1F2937;
+    color: #FFFFFF;
+  }
+
+  .dark .tag-button-active {
+    background-color: #B8860B;
+    color: #FFFFFF;
+  }
+}
