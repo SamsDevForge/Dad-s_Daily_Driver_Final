@@ -2,6 +2,10 @@ import { apiFetch } from './api';
 
 const STORAGE_KEY = 'dads_daily_events';
 
+const createEventId = () => (
+  crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`
+);
+
 const initStorage = () => {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (!stored) {
@@ -31,15 +35,16 @@ export const saveEvent = async (event) => {
     return saved;
   } catch {
     const events = await getEvents();
+    const nextEvent = { ...event };
     let updated;
-    if (event.id) {
-      updated = events.map(e => e.id === event.id ? event : e);
+    if (nextEvent.id) {
+      updated = events.map(e => e.id === nextEvent.id ? nextEvent : e);
     } else {
-      event.id = Date.now().toString();
-      updated = [...events, event];
+      nextEvent.id = createEventId();
+      updated = [...events, nextEvent];
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-    return event;
+    return nextEvent;
   }
 };
 

@@ -40,6 +40,10 @@ const toEventTime = ({ hour, minute, period }) => {
   return `${String(hours24).padStart(2, '0')}:${minute}`;
 };
 
+const eventDateTime = (event) => new Date(`${event.date}T${event.time || '00:00'}`);
+
+const sortByDateTime = (items) => [...items].sort((a, b) => eventDateTime(a) - eventDateTime(b));
+
 function EventTimelineCard({ event, onDelete, highlight }) {
   const { color, icon: Icon, line } = getTagConfig(event.tag);
   
@@ -107,21 +111,17 @@ export default function EventsManager({ className }) {
 
   const fetchEvents = async () => {
     const data = await getEvents();
-    const sorted = [...data].sort((a, b) => new Date(`${a.date}T${a.time || '00:00'}`) - new Date(`${b.date}T${b.time || '00:00'}`));
-    setEvents(sorted);
+    setEvents(sortByDateTime(data));
   };
 
   useEffect(() => {
-    getEvents().then(data => {
-      const sorted = [...data].sort((a, b) => new Date(`${a.date}T${a.time || '00:00'}`) - new Date(`${b.date}T${b.time || '00:00'}`));
-      setEvents(sorted);
-    });
+    getEvents().then(data => setEvents(sortByDateTime(data)));
   }, []);
 
   const handleSave = async (e) => {
     e.preventDefault();
     if (!formData.title || !formData.date) return;
-    await saveEvent(formData);
+    await saveEvent({ ...formData, time: formData.time || '09:00' });
     setFormData({ title: '', date: '', time: '', tag: 'Family', notes: '', reminder: true });
     setIsModalOpen(false);
     fetchEvents();
@@ -158,6 +158,7 @@ export default function EventsManager({ className }) {
 
   const today = new Date().toISOString().split('T')[0];
   const upcomingEvents = events.filter(e => e.date >= today);
+  const pastEvents = events.filter(e => e.date < today).reverse();
   const upNext = upcomingEvents[0];
   const hasAnniversaryEvent = events.some(e => (
     e.title?.toLowerCase().includes('marriage anniversary')
@@ -166,6 +167,7 @@ export default function EventsManager({ className }) {
   const remainingEvents = [
     ...upcomingEvents.slice(1).filter(e => e.tag === 'Family'),
     ...upcomingEvents.slice(1).filter(e => e.tag !== 'Family'),
+    ...pastEvents,
   ];
 
   return (
@@ -176,8 +178,8 @@ export default function EventsManager({ className }) {
         </h2>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-2 pb-24 md:pb-8 flex flex-col relative">
-        <div className="py-2">
+      <div className="flex-1 overflow-y-auto px-2 pb-6 md:pb-8 flex flex-col relative">
+        <div className="py-2 pb-4">
           {upNext && (
             <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}>
               <EventTimelineCard event={upNext} onDelete={handleDelete} highlight />
@@ -190,7 +192,7 @@ export default function EventsManager({ className }) {
             </motion.div>
           ))}
 
-          {upcomingEvents.length === 0 && (
+          {events.length === 0 && (
             <div className="py-12 text-center flex flex-col items-center justify-center">
               <Calendar className="text-gray-300 mb-3" size={40} />
               <p className="text-text-muted font-medium">Timeline is clear.</p>
@@ -199,7 +201,7 @@ export default function EventsManager({ className }) {
         </div>
 
         {/* Floating Action Button */}
-        <div className="absolute bottom-6 right-2 z-10 flex items-center gap-3">
+        <div className="sticky bottom-4 z-10 mt-auto flex items-center justify-end gap-3 pb-2">
           {!hasAnniversaryEvent && (
             <div className="max-w-[210px] rounded-2xl bg-white/95 px-3 py-2 text-right text-[11px] font-semibold leading-snug text-text-muted shadow-premium-sm dark:bg-gray-800/95 dark:text-gray-300">
               <p>
