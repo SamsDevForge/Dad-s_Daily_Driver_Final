@@ -14,6 +14,32 @@ const getTagConfig = (tag) => {
   }
 };
 
+const TIME_HOURS = Array.from({ length: 12 }, (_, i) => String(i + 1).padStart(2, '0'));
+const TIME_MINUTES = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, '0'));
+
+const parseEventTime = (time = '09:00') => {
+  const [rawHours, rawMinutes] = String(time || '09:00').split(':').map(Number);
+  const hours24 = Number.isFinite(rawHours) ? rawHours : 9;
+  const minutes = Number.isFinite(rawMinutes) ? rawMinutes : 0;
+  const period = hours24 >= 12 ? 'PM' : 'AM';
+  const hours12 = hours24 % 12 || 12;
+
+  return {
+    hour: String(hours12).padStart(2, '0'),
+    minute: String(minutes).padStart(2, '0'),
+    period,
+  };
+};
+
+const toEventTime = ({ hour, minute, period }) => {
+  const numericHour = Number(hour);
+  const hours24 = period === 'PM'
+    ? (numericHour % 12) + 12
+    : numericHour % 12;
+
+  return `${String(hours24).padStart(2, '0')}:${minute}`;
+};
+
 function EventTimelineCard({ event, onDelete, highlight }) {
   const { color, icon: Icon, line } = getTagConfig(event.tag);
   
@@ -77,6 +103,7 @@ export default function EventsManager({ className }) {
   const [events, setEvents] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({ title: '', date: '', time: '', tag: 'Family', notes: '', reminder: true });
+  const timeParts = parseEventTime(formData.time);
 
   const fetchEvents = async () => {
     const data = await getEvents();
@@ -120,6 +147,13 @@ export default function EventsManager({ className }) {
   const handleAddEvent = () => {
     setFormData({ title: '', date: '', time: '', tag: 'Family', notes: '', reminder: true });
     setIsModalOpen(true);
+  };
+
+  const handleTimeChange = (part, value) => {
+    setFormData((current) => {
+      const nextTime = { ...parseEventTime(current.time), [part]: value };
+      return { ...current, time: toEventTime(nextTime) };
+    });
   };
 
   const today = new Date().toISOString().split('T')[0];
@@ -220,7 +254,31 @@ export default function EventsManager({ className }) {
                   </div>
                   <div>
                     <label className="form-label text-xs font-bold uppercase tracking-wider mb-2 block ml-1">Time</label>
-                    <input required value={formData.time} onChange={e => setFormData({...formData, time: e.target.value})} type="time" className="form-control w-full h-14 px-5 rounded-2xl border-none focus:ring-2 focus:ring-secondary outline-none transition-all font-medium" />
+                    <div className="form-control w-full h-14 px-3 rounded-2xl border-none focus-within:ring-2 focus-within:ring-secondary outline-none transition-all font-medium flex items-center gap-1">
+                      <select
+                        value={timeParts.hour}
+                        onChange={e => handleTimeChange('hour', e.target.value)}
+                        className="w-14 bg-transparent outline-none font-bold text-center"
+                      >
+                        {TIME_HOURS.map(hour => <option key={hour} value={hour}>{hour}</option>)}
+                      </select>
+                      <span className="font-black text-text-muted dark:text-gray-400">:</span>
+                      <select
+                        value={timeParts.minute}
+                        onChange={e => handleTimeChange('minute', e.target.value)}
+                        className="w-14 bg-transparent outline-none font-bold text-center"
+                      >
+                        {TIME_MINUTES.map(minute => <option key={minute} value={minute}>{minute}</option>)}
+                      </select>
+                      <select
+                        value={timeParts.period}
+                        onChange={e => handleTimeChange('period', e.target.value)}
+                        className="ml-auto w-16 bg-transparent outline-none font-bold text-center"
+                      >
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
