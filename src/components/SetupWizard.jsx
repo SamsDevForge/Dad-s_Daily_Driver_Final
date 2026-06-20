@@ -162,7 +162,7 @@ export default function SetupWizard({ onComplete }) {
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-text-muted dark:text-gray-500 text-center mt-4">This is limited to Pune for now.</p>
+              <p className="text-xs text-text-muted dark:text-gray-500 text-center mt-4">Weather uses the city you choose here.</p>
             </div>
           )}
 

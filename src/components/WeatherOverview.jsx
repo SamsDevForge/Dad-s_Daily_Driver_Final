@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { CloudSun, Droplets, ThermometerSun } from 'lucide-react';
 import { getWeather } from '../services/weatherService';
+import { getSetup } from '../services/setupService';
 import { cn } from '../lib/utils';
 import { motion } from 'framer-motion';
 
@@ -31,7 +32,8 @@ export default function WeatherOverview({ className }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getWeather().then(data => {
+    const setup = getSetup();
+    getWeather(setup?.city).then(data => {
       setWeather(data);
       setLoading(false);
     });

@@ -3,6 +3,7 @@ import { cn } from '../lib/utils';
 import { useEffect, useState } from 'react';
 import { getWeather } from '../services/weatherService';
 import { getMedicines } from '../services/medicineService';
+import { getSetup } from '../services/setupService';
 import { motion } from 'framer-motion';
 
 export default function Header({ className }) {
@@ -10,7 +11,8 @@ export default function Header({ className }) {
   const [nextMed, setNextMed] = useState(null);
 
   useEffect(() => {
-    getWeather().then(setWeather);
+    const setup = getSetup();
+    getWeather(setup?.city).then(setWeather);
     getMedicines().then(meds => {
       const pending = meds.filter(m => m.status === 'Pending');
       if (pending.length > 0) {

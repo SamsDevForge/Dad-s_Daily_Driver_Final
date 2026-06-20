@@ -1,5 +1,6 @@
 import { weatherData } from '../data/mockData';
 import { apiFetch } from './api';
+import { getSetup } from './setupService';
 
 const titleCase = (value = '') => value
   .split(' ')
@@ -58,10 +59,11 @@ const getClientWeather = async (city = 'Pune') => {
 };
 
 export const getWeather = async (city) => {
+  const preferredCity = city || getSetup()?.city || 'Pune';
   try {
-    const query = city ? `?city=${encodeURIComponent(city)}` : '';
+    const query = `?city=${encodeURIComponent(preferredCity)}`;
     return await apiFetch(`/api/weather${query}`);
   } catch {
-    return await getClientWeather(city) || weatherData;
+    return await getClientWeather(preferredCity) || { ...weatherData, city: preferredCity };
   }
 };
