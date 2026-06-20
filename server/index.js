@@ -196,7 +196,8 @@ function decodeHtmlEntities(value) {
 }
 
 function cleanNewsText(value = '') {
-  return decodeHtmlEntities(String(value)
+  if (value === null || value === undefined) return '';
+  const cleaned = decodeHtmlEntities(String(value)
     .replace(/<\s*br\s*\/?>/gi, ' ')
     .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, ' ')
     .replace(/<[^>]*>/g, ' ')
@@ -205,6 +206,7 @@ function cleanNewsText(value = '') {
     .replace(/\s*\.\.\.\s*$/g, '')
     .replace(/\s{2,}/g, ' ')
     .trim());
+  return /^(null|undefined|n\/a)$/i.test(cleaned) ? '' : cleaned;
 }
 
 function categoryLabel(category, fallback = 'India') {
@@ -239,15 +241,15 @@ async function fetchNewsData(topics = []) {
     .filter((item) => item.title)
     .map((item, index) => {
       const headline = cleanNewsText(item.title);
-      const summary = cleanNewsText(item.description) || headline;
-      const fullText = cleanNewsText(item.content) || summary;
+      const fullText = cleanNewsText(item.content);
+      const summary = cleanNewsText(item.description) || fullText || headline;
 
       return {
         id: item.article_id || item.link || `${Date.now()}-${index}`,
         category: categoryLabel(item.category),
         headline,
         summary,
-        fullText,
+        fullText: fullText || summary,
         date: newsDateLabel(item.pubDate),
         imageUrl: item.image_url,
         url: item.link,

@@ -26,15 +26,19 @@ const decodeHtmlEntities = (value) => value.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi,
   return htmlEntities[normalized] || match;
 });
 
-const cleanNewsText = (value = '') => decodeHtmlEntities(String(value)
-  .replace(/<\s*br\s*\/?>/gi, ' ')
-  .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, ' ')
-  .replace(/<[^>]*>/g, ' ')
-  .replace(/ONLY AVAILABLE IN PAID PLANS/gi, '')
-  .replace(/\[\s*\+\s*\d+\s*chars\s*\]/gi, '')
-  .replace(/\s*\.\.\.\s*$/g, '')
-  .replace(/\s{2,}/g, ' ')
-  .trim());
+const cleanNewsText = (value = '') => {
+  if (value === null || value === undefined) return '';
+  const cleaned = decodeHtmlEntities(String(value)
+    .replace(/<\s*br\s*\/?>/gi, ' ')
+    .replace(/<\/\s*(p|div|li|h[1-6])\s*>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/ONLY AVAILABLE IN PAID PLANS/gi, '')
+    .replace(/\[\s*\+\s*\d+\s*chars\s*\]/gi, '')
+    .replace(/\s*\.\.\.\s*$/g, '')
+    .replace(/\s{2,}/g, ' ')
+    .trim());
+  return /^(null|undefined|n\/a)$/i.test(cleaned) ? '' : cleaned;
+};
 
 const titleCase = (value = '') => value
   .split(' ')
@@ -71,8 +75,8 @@ const getClientNews = async () => {
     .filter((item) => item.title)
     .map((item, index) => {
       const headline = cleanNewsText(item.title);
-      const summary = cleanNewsText(item.description) || headline;
-      const fullText = cleanNewsText(item.content) || summary;
+      const fullText = cleanNewsText(item.content);
+      const summary = cleanNewsText(item.description) || fullText || headline;
       const category = Array.isArray(item.category) && item.category.length
         ? titleCase(item.category[0])
         : 'India';
@@ -82,7 +86,7 @@ const getClientNews = async () => {
         category,
         headline,
         summary,
-        fullText,
+        fullText: fullText || summary,
         date: dateLabel(item.pubDate),
         imageUrl: item.image_url,
         url: item.link,

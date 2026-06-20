@@ -16,12 +16,19 @@ const getImageForCategory = (category) => {
 
 function NewsCard({ news }) {
   const [expanded, setExpanded] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
   const hasExtraText = news.fullText && news.fullText !== news.summary;
+  const fallbackImage = getImageForCategory(news.category);
 
   return (
     <div className="premium-card flex flex-col group relative overflow-hidden transition-all duration-300 dark:bg-gray-800 dark:border-gray-700">
       <div className="h-40 w-full overflow-hidden relative">
-        <img src={news.imageUrl || getImageForCategory(news.category)} alt="" className="w-full h-full object-cover" />
+        <img
+          src={!imageFailed && news.imageUrl ? news.imageUrl : fallbackImage}
+          alt=""
+          className="w-full h-full object-cover"
+          onError={() => setImageFailed(true)}
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
         <div className="absolute bottom-3 left-3 flex justify-between items-center w-[calc(100%-24px)]">
           <span className="px-3 py-1 rounded-full text-xs font-bold tracking-wider text-white bg-black/30 backdrop-blur-md border border-white/20">
