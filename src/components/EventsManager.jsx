@@ -26,9 +26,9 @@ function EventTimelineCard({ event, onDelete, highlight }) {
       <div className={cn("absolute left-1 top-2 w-4 h-4 rounded-full border-2 border-white shadow-sm z-10", line)}></div>
 
       <div className={cn(
-        "premium-card p-5 flex flex-col gap-3 relative transition-all duration-300",
-        highlight ? "ring-2 ring-primary/20 shadow-premium" : "shadow-sm border border-gray-50",
-        event.tag === 'Family' ? "bg-[#fffaf5]" : "" // Special warm styling for Family
+        "premium-card p-5 flex flex-col gap-3 relative transition-all duration-300 dark:bg-gray-800",
+        highlight ? "ring-2 ring-primary/20 shadow-premium" : "shadow-sm border border-gray-50 dark:border-gray-700",
+        event.tag === 'Family' ? "bg-[#fffaf5] dark:bg-gray-800" : "" // Special warm styling for Family
       )}>
         {highlight && (
           <div className="absolute top-0 right-0 px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase tracking-widest rounded-bl-2xl rounded-tr-3xl">
@@ -43,21 +43,21 @@ function EventTimelineCard({ event, onDelete, highlight }) {
                 <Icon size={12} /> {event.tag}
               </span>
             </div>
-            <h3 className="text-lg font-bold text-text-deep leading-tight pr-12">{event.title}</h3>
+            <h3 className="text-lg font-bold text-text-deep dark:text-white leading-tight pr-12">{event.title}</h3>
           </div>
         </div>
 
         <div className="flex flex-col gap-2 mt-1">
-          <div className="flex items-center gap-2 text-sm font-semibold text-text-muted">
-            <div className="p-1.5 rounded-lg bg-gray-50"><Calendar size={14} /></div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-text-muted dark:text-gray-400">
+            <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-gray-700"><Calendar size={14} /></div>
             {new Date(event.date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
           </div>
-          <div className="flex items-center gap-2 text-sm font-semibold text-text-muted">
-            <div className="p-1.5 rounded-lg bg-gray-50"><Clock size={14} /></div>
+          <div className="flex items-center gap-2 text-sm font-semibold text-text-muted dark:text-gray-400">
+            <div className="p-1.5 rounded-lg bg-gray-50 dark:bg-gray-700"><Clock size={14} /></div>
             {event.time}
           </div>
           {event.notes && (
-            <p className="text-sm text-text-muted mt-2 pl-2 border-l-2 border-gray-100">
+            <p className="text-sm text-text-muted dark:text-gray-400 mt-2 pl-2 border-l-2 border-gray-100 dark:border-gray-700">
               {event.notes}
             </p>
           )}
@@ -105,9 +105,30 @@ export default function EventsManager({ className }) {
     fetchEvents();
   };
 
+  const handleAddAnniversary = () => {
+    setFormData({
+      title: 'Marriage Anniversary',
+      date: '',
+      time: '09:00',
+      tag: 'Family',
+      notes: 'Important day. Do not miss this.',
+      reminder: true,
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleAddEvent = () => {
+    setFormData({ title: '', date: '', time: '', tag: 'Family', notes: '', reminder: true });
+    setIsModalOpen(true);
+  };
+
   const today = new Date().toISOString().split('T')[0];
   const upcomingEvents = events.filter(e => e.date >= today);
   const upNext = upcomingEvents[0];
+  const hasAnniversaryEvent = events.some(e => (
+    e.title?.toLowerCase().includes('marriage anniversary')
+    || e.title?.toLowerCase().includes('anniversary')
+  ));
   const remainingEvents = [
     ...upcomingEvents.slice(1).filter(e => e.tag === 'Family'),
     ...upcomingEvents.slice(1).filter(e => e.tag !== 'Family'),
@@ -145,11 +166,22 @@ export default function EventsManager({ className }) {
 
         {/* Floating Action Button */}
         <div className="absolute bottom-6 right-2 z-10 flex items-center gap-3">
-          <div className="max-w-[190px] rounded-2xl bg-white/95 px-3 py-2 text-right text-[11px] font-semibold leading-snug text-text-muted shadow-premium-sm dark:bg-gray-800/95 dark:text-gray-300">
-            Add your marriage anniversary. We recommend this <strong className="text-rose-500 dark:text-rose-300">for your safety</strong>.
-          </div>
+          {!hasAnniversaryEvent && (
+            <div className="max-w-[210px] rounded-2xl bg-white/95 px-3 py-2 text-right text-[11px] font-semibold leading-snug text-text-muted shadow-premium-sm dark:bg-gray-800/95 dark:text-gray-300">
+              <p>
+                Add your marriage anniversary. We recommend this <strong className="text-rose-500 dark:text-rose-300">for your safety</strong>.
+              </p>
+              <button
+                type="button"
+                onClick={handleAddAnniversary}
+                className="mt-2 rounded-xl bg-rose-500 px-3 py-1.5 text-[11px] font-black text-white shadow-sm hover:bg-rose-600 transition-colors"
+              >
+                Add Anniversary
+              </button>
+            </div>
+          )}
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={handleAddEvent}
             className="h-14 w-14 rounded-full bg-secondary text-white flex items-center justify-center shadow-lg shadow-secondary/40 hover:scale-105 transition-transform"
             aria-label="Add event"
           >
