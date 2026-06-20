@@ -7,9 +7,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 function DocumentCard({ doc }) {
   const isPdf = doc.type?.toLowerCase() === 'pdf';
   const Icon = isPdf ? FileText : ImageIcon;
+  const canOpen = Boolean(doc.url);
+
+  const handleOpen = () => {
+    if (!canOpen) return;
+    const newWindow = window.open();
+    if (newWindow) {
+      newWindow.document.title = doc.name;
+      if (isPdf) {
+        newWindow.location.href = doc.url;
+      } else {
+        newWindow.document.body.style.margin = '0';
+        newWindow.document.body.style.background = '#111827';
+        newWindow.document.body.innerHTML = `<img src="${doc.url}" alt="${doc.name}" style="max-width:100%;height:auto;display:block;margin:0 auto;" />`;
+      }
+      return;
+    }
+    window.location.href = doc.url;
+  };
 
   return (
-    <div className="premium-card p-4 flex items-center justify-between group hover:shadow-premium transition-all cursor-pointer border border-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
+    <button
+      type="button"
+      onClick={handleOpen}
+      disabled={!canOpen}
+      className={cn(
+        "premium-card p-4 flex items-center justify-between group hover:shadow-premium transition-all border border-gray-50/50 dark:bg-gray-800 dark:border-gray-700 text-left w-full",
+        canOpen ? "cursor-pointer" : "cursor-default opacity-80"
+      )}
+    >
       <div className="flex items-center gap-4">
         <div className={cn(
           "h-14 w-12 rounded-lg flex items-center justify-center shadow-sm relative overflow-hidden",
@@ -29,7 +55,13 @@ function DocumentCard({ doc }) {
           </span>
         </div>
       </div>
-    </div>
+      <span className={cn(
+        "text-xs font-bold px-3 py-1.5 rounded-full",
+        canOpen ? "bg-primary/10 text-primary" : "bg-gray-100 dark:bg-gray-700 text-text-muted dark:text-gray-400"
+      )}>
+        {canOpen ? 'Open' : 'No file'}
+      </span>
+    </button>
   );
 }
 

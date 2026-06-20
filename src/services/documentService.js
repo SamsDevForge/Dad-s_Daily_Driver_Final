@@ -9,10 +9,22 @@ const initStorage = () => {
   }
 };
 
-const formDataToDocument = (formData) => {
+const fileToDataUrl = (file) => new Promise((resolve, reject) => {
+  if (!file || typeof file === 'string') {
+    resolve('');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = () => resolve(reader.result);
+  reader.onerror = reject;
+  reader.readAsDataURL(file);
+});
+
+const formDataToDocument = async (formData) => {
   const file = formData.get('file');
   const fileName = file?.name || '';
   const fileType = file?.type?.includes('pdf') ? 'pdf' : file?.type?.startsWith('image/') ? 'image' : 'file';
+  const url = await fileToDataUrl(file);
 
   return {
     id: formData.get('id') || undefined,
@@ -22,7 +34,7 @@ const formDataToDocument = (formData) => {
     description: formData.get('description') || '',
     type: fileType,
     fileType,
-    url: '',
+    url,
     uploadDate: new Date().toISOString().split('T')[0],
   };
 };
@@ -63,7 +75,7 @@ export const saveDocument = async (document) => {
     return saved;
   } catch {
     const documents = await getDocuments();
-    const nextDocument = document instanceof FormData ? formDataToDocument(document) : document;
+    const nextDocument = document instanceof FormData ? await formDataToDocument(document) : document;
     let updated;
     if (nextDocument.id) {
       updated = documents.map(d => d.id === nextDocument.id ? nextDocument : d);
