@@ -144,12 +144,18 @@ export default function EventsManager({ className }) {
         </div>
 
         {/* Floating Action Button */}
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="absolute bottom-6 right-2 h-14 w-14 rounded-full bg-secondary text-white flex items-center justify-center shadow-lg shadow-secondary/40 hover:scale-105 transition-transform z-10"
-        >
-          <Plus size={24} />
-        </button>
+        <div className="absolute bottom-6 right-2 z-10 flex items-center gap-3">
+          <div className="max-w-[190px] rounded-2xl bg-white/95 px-3 py-2 text-right text-[11px] font-semibold leading-snug text-text-muted shadow-premium-sm dark:bg-gray-800/95 dark:text-gray-300">
+            Add your marriage anniversary. We recommend this <strong className="text-rose-500 dark:text-rose-300">for your safety</strong>.
+          </div>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="h-14 w-14 rounded-full bg-secondary text-white flex items-center justify-center shadow-lg shadow-secondary/40 hover:scale-105 transition-transform"
+            aria-label="Add event"
+          >
+            <Plus size={24} />
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>
