@@ -6,6 +6,21 @@ import { cn } from '../lib/utils';
 
 const NEWS_TOPICS = ['India', 'Business', 'Health', 'Local', 'Sports', 'Technology', 'Weather', 'Politics'];
 
+const stripNameNumbers = (value) => value.replace(/[0-9]/g, '');
+
+const getIndianPhoneDigits = (value = '') => {
+  const digits = String(value).replace(/\D/g, '');
+  const localDigits = digits.length > 10 && digits.startsWith('91')
+    ? digits.slice(2)
+    : digits;
+  return localDigits.slice(0, 10);
+};
+
+const formatIndianPhone = (value) => {
+  const digits = getIndianPhoneDigits(value);
+  return digits ? `+91 ${digits}` : '+91 ';
+};
+
 const steps = [
   { id: 'welcome', title: "Welcome to Dad's Daily Driver", subtitle: "Let's set up a few things to personalize your experience." },
   { id: 'son',     title: "Son's Contact",              subtitle: "Add your son's phone number for quick access and emergency calls." },
@@ -18,7 +33,7 @@ export default function SetupWizard({ onComplete }) {
   const [step, setStep] = useState(0);
   const [form, setForm] = useState({
     sonName: '',
-    sonPhone: '',
+    sonPhone: '+91 ',
     sonRelation: 'Son',
     city: 'Pune',
     newsTopics: ['India', 'Health'],
@@ -27,6 +42,7 @@ export default function SetupWizard({ onComplete }) {
   const current = steps[step];
   const isLast = step === steps.length - 1;
   const isFirst = step === 0;
+  const canContinue = current.id !== 'son' || getIndianPhoneDigits(form.sonPhone).length === 10;
 
   const toggleTopic = (t) => {
     setForm(f => ({
@@ -43,6 +59,7 @@ export default function SetupWizard({ onComplete }) {
   };
 
   const next = () => {
+    if (!canContinue) return;
     if (isLast) { handleFinish(); return; }
     setStep(s => s + 1);
   };
@@ -108,7 +125,7 @@ export default function SetupWizard({ onComplete }) {
                       type="text"
                       placeholder="e.g. Rahul"
                       value={form.sonName}
-                      onChange={e => setForm(f => ({ ...f, sonName: e.target.value }))}
+                      onChange={e => setForm(f => ({ ...f, sonName: stripNameNumbers(e.target.value) }))}
                       className="w-full bg-transparent outline-none font-semibold text-text-deep dark:text-white text-base placeholder:text-gray-300 dark:placeholder:text-gray-600"
                     />
                   </div>
@@ -121,13 +138,14 @@ export default function SetupWizard({ onComplete }) {
                       type="tel"
                       placeholder="+91 98765 43210"
                       value={form.sonPhone}
-                      onChange={e => setForm(f => ({ ...f, sonPhone: e.target.value }))}
+                      onChange={e => setForm(f => ({ ...f, sonPhone: formatIndianPhone(e.target.value) }))}
+                      maxLength={14}
                       className="w-full bg-transparent outline-none font-semibold text-text-deep dark:text-white text-base placeholder:text-gray-300 dark:placeholder:text-gray-600"
                     />
                   </div>
                 </div>
               </div>
-              <p className="text-xs text-text-muted dark:text-gray-500 text-center">Used for emergency quick-call. Never shared.</p>
+              <p className="text-xs text-text-muted dark:text-gray-500 text-center">Enter 10 digits after +91. Used for emergency quick-call.</p>
             </div>
           )}
 
@@ -229,7 +247,11 @@ export default function SetupWizard({ onComplete }) {
         )}
         <button
           onClick={next}
-          className="flex-1 h-14 rounded-2xl bg-primary text-white font-bold text-base shadow-lg shadow-primary/25 flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-95 transition-all"
+          disabled={!canContinue}
+          className={cn(
+            "flex-1 h-14 rounded-2xl bg-primary text-white font-bold text-base shadow-lg shadow-primary/25 flex items-center justify-center gap-2 hover:bg-primary/90 active:scale-95 transition-all",
+            !canContinue && "opacity-60 cursor-not-allowed hover:bg-primary active:scale-100"
+          )}
         >
           {isLast ? "Let's Go!" : "Continue"}
           {!isLast && <ChevronRight size={20} />}
