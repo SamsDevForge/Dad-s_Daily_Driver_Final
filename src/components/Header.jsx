@@ -6,6 +6,15 @@ import { getMedicines } from '../services/medicineService';
 import { getSetup } from '../services/setupService';
 import { motion } from 'framer-motion';
 
+const getGreeting = (date = new Date()) => {
+  const hour = date.getHours();
+  if (hour < 5) return 'Good Night';
+  if (hour < 12) return 'Good Morning';
+  if (hour < 17) return 'Good Afternoon';
+  if (hour < 21) return 'Good Evening';
+  return 'Good Night';
+};
+
 export default function Header({ className }) {
   const [weather, setWeather] = useState(null);
   const [nextMed, setNextMed] = useState(null);
@@ -23,6 +32,7 @@ export default function Header({ className }) {
   }, []);
 
   const today = new Date();
+  const greeting = getGreeting(today);
   const options = { weekday: 'long', month: 'long', day: 'numeric' };
   const dateString = today.toLocaleDateString('en-US', options);
 
@@ -31,7 +41,7 @@ export default function Header({ className }) {
       <div className="flex justify-between items-start mb-6">
         <div className="flex flex-col">
           <h1 className="text-2xl font-bold tracking-tight text-text-deep dark:text-white">
-            Good Morning, Dad
+            {greeting}, Dad
           </h1>
           <p className="text-sm font-medium text-text-muted dark:text-gray-400 mt-0.5">
             {dateString}
